@@ -1,0 +1,38 @@
+# macOS metadata and local tooling
+.DS_Store
+._*
+.AppleDouble/
+node_modules/
+__pycache__/
+*.py[cod]
+*.log
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Generated applications, local archives and inspection outputs
+/dist/
+/archive/
+/inspection/
+*.app/
+*.zip
+*.dmg
+
+# Experimental input/output data are never part of the public source tree.
+*.sgd
+*.fcs
+*.gelproject
+*.tif
+*.tiff
+/Tests/Fixtures/
+/Tests/UIInputs/
+/Tests/make_reference_fixture.py
+
+# Only the current packaged icon is needed to build GelFriend.
+/Assets/*
+!/Assets/GelFriend.icns
+
+# Historical flow-cytometry planning belongs to the separate application.
+/Docs/FlowJo功能对应.md

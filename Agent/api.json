@@ -1,0 +1,1012 @@
+{
+  "apiVersion": "1.0",
+  "application": "GelFriend",
+  "transport": "local Unix socket JSON-RPC 2.0; MCP stdio adapter",
+  "limits": {
+    "requestBytes": 1048576,
+    "responseBytes": 16777216,
+    "concurrentClients": 8,
+    "operationSeconds": 90
+  },
+  "methods": [
+    {
+      "name": "system.describe",
+      "toolName": "gelfriend_system_describe",
+      "description": "Describe the API, available methods, limits and protocol version.",
+      "readOnly": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "workspace.state",
+      "toolName": "gelfriend_workspace_state",
+      "description": "Read active document, revision, workflow, channels, lanes and pending issues. Does not include raw pixels.",
+      "readOnly": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "document.preview",
+      "toolName": "gelfriend_document_preview",
+      "description": "Read a full gel preview PNG (maximum 1600 px per edge), viewing transform and current context. MCP returns an image content block so the agent can inspect the gel without screen automation. Display pixels only; original quantitative data are unchanged.",
+      "readOnly": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "annotated": {
+            "type": "boolean"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "document.open",
+      "toolName": "gelfriend_document_open",
+      "description": "Open an absolute local SGD/TIFF/PNG or gelproject path. Replaces the current document only after explicit save or discardChanges=true. experiment is required for raw images. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "experiment": {
+            "type": "string",
+            "enum": [
+              "dna",
+              "protein",
+              "western",
+              "colony",
+              "spots"
+            ]
+          },
+          "discardChanges": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision",
+          "path"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "document.save",
+      "toolName": "gelfriend_document_save",
+      "description": "Save a complete editable gelproject to an absolute path. Existing files require overwrite=true. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "overwrite": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision",
+          "path"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "document.exportImage",
+      "toolName": "gelfriend_document_exportImage",
+      "description": "Export a full display PNG, optionally annotated. Returns path; original scientific pixels are not modified. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "annotated": {
+            "type": "boolean"
+          },
+          "overwrite": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision",
+          "path"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "document.exportReport",
+      "toolName": "gelfriend_document_exportReport",
+      "description": "Export a new report folder under an existing absolute directory. Pending issues produce a draft report, never a claim of human review. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "directory": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision",
+          "directory"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "view.set",
+      "toolName": "gelfriend_view_set",
+      "description": "Set shared viewing angle and per-channel display parameters; does not alter measured pixels. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "angle": {
+            "type": "number"
+          },
+          "display": {
+            "type": "object",
+            "properties": {
+              "low": {
+                "type": "number"
+              },
+              "high": {
+                "type": "number"
+              },
+              "gamma": {
+                "type": "number"
+              },
+              "inverted": {
+                "type": "boolean"
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "selection.set",
+      "toolName": "gelfriend_selection_set",
+      "description": "Select a channel/lane using stable IDs returned by workspace.state. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "channelId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "laneId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "workflow.go",
+      "toolName": "gelfriend_workflow_go",
+      "description": "Navigate to an allowed experiment step. Cannot bypass lane confirmation. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "step": {
+            "type": "string",
+            "enum": [
+              "viewer",
+              "lanes",
+              "bands",
+              "marker",
+              "quantity",
+              "western",
+              "region",
+              "count",
+              "regions",
+              "measure",
+              "results"
+            ]
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision",
+          "step"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "lanes.create",
+      "toolName": "gelfriend_lanes_create",
+      "description": "Create lanes in original raw-image pixel coordinates; supports straight or slanted centre lines. Fresh IDs are allocated. replaceExisting must be explicit. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "lanes": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 200,
+            "items": {
+              "type": "object",
+              "properties": {
+                "xTop": {
+                  "type": "number"
+                },
+                "xBottom": {
+                  "type": "number"
+                },
+                "y0": {
+                  "type": "number"
+                },
+                "y1": {
+                  "type": "number"
+                },
+                "width": {
+                  "type": "number"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "xTop",
+                "xBottom",
+                "y0",
+                "y1",
+                "width"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "replaceExisting": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision",
+          "lanes"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "lanes.update",
+      "toolName": "gelfriend_lanes_update",
+      "description": "Update one lane. Coordinates use its returned frame, or raw pixels when frame is null. Existing bands are clipped/reintegrated using UI logic. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "laneId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "geometry": {
+            "type": "object",
+            "properties": {
+              "xTop": {
+                "type": "number"
+              },
+              "xBottom": {
+                "type": "number"
+              },
+              "y0": {
+                "type": "number"
+              },
+              "y1": {
+                "type": "number"
+              },
+              "width": {
+                "type": "number"
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision",
+          "laneId"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "lanes.delete",
+      "toolName": "gelfriend_lanes_delete",
+      "description": "Delete one lane; dependent standards become pending. Undo is available. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "laneId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision",
+          "laneId"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "lanes.setMarker",
+      "toolName": "gelfriend_lanes_setMarker",
+      "description": "Assign a library marker ID to a lane; markerId=null makes it a sample lane. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "laneId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "markerId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision",
+          "laneId",
+          "markerId"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "lanes.confirm",
+      "toolName": "gelfriend_lanes_confirm",
+      "description": "Confirm existing lane geometry and enter band review. Does not claim band review. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "bands.detect",
+      "toolName": "gelfriend_bands_detect",
+      "description": "Detect candidates in the bands step. Manual bands require replaceManual=true; new IDs invalidate old pairings. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "current",
+              "lanes",
+              "channels"
+            ]
+          },
+          "replaceManual": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "bands.upsert",
+      "toolName": "gelfriend_bands_upsert",
+      "description": "Add or edit a band in the current channel and specified lane while in bands step. y0/y1 use the lane coordinate frame, integer pixels. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "laneId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "bandId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "y0": {
+            "type": "integer"
+          },
+          "y1": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision",
+          "laneId",
+          "y0",
+          "y1"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "bands.delete",
+      "toolName": "gelfriend_bands_delete",
+      "description": "Delete an existing band in the current channel while in bands step. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "laneId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "bandId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision",
+          "laneId",
+          "bandId"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "markers.list",
+      "toolName": "gelfriend_markers_list",
+      "description": "Read built-in and personal marker standards. Values are not generated by the agent.",
+      "readOnly": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "markers.create",
+      "toolName": "gelfriend_markers_create",
+      "description": "Create a personal standard from explicit manufacturer/user values; does not invent standards. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "bp",
+              "kDa"
+            ]
+          },
+          "values": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 200,
+            "items": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "source": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision",
+          "name",
+          "unit",
+          "values"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "markers.pair",
+      "toolName": "gelfriend_markers_pair",
+      "description": "Pair one marker value with a real band. bandId=null removes pairing, skip=true marks a missing standard. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "laneId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": "number"
+          },
+          "bandId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "skip": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision",
+          "laneId",
+          "value"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "calibration.fitSize",
+      "toolName": "gelfriend_calibration_fitSize",
+      "description": "Fit size from explicit marker pairings in the current channel; validates units, saturation and point order. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "loglinear",
+              "piecewise"
+            ]
+          },
+          "combine": {
+            "type": "string",
+            "enum": [
+              "nearest",
+              "average",
+              "interpolate"
+            ]
+          },
+          "extrapolate": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "calibration.fitQuantity",
+      "toolName": "gelfriend_calibration_fitQuantity",
+      "description": "Fit known amounts from explicit standards in the current channel. Does not use bp/kDa as amounts. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "standards": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 200,
+            "items": {
+              "type": "object",
+              "properties": {
+                "laneId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "bandId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              },
+              "required": [
+                "laneId",
+                "bandId",
+                "value"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "linear",
+              "origin",
+              "quadratic",
+              "quadraticOrigin"
+            ]
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision",
+          "standards",
+          "unit"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "western.normalise",
+      "toolName": "gelfriend_western_normalise",
+      "description": "Normalise explicit target/reference assignments. Multi-channel data requires aligned=true supplied by the user after alignment review. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "targetChannelId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "referenceChannelId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "referenceLaneId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "band",
+              "total"
+            ]
+          },
+          "aligned": {
+            "type": "boolean"
+          },
+          "assignments": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "object",
+              "properties": {
+                "laneId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "targetBandId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "referenceBandId": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "laneId",
+                "targetBandId"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision",
+          "targetChannelId",
+          "referenceChannelId",
+          "referenceLaneId",
+          "method",
+          "assignments"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "results.read",
+      "toolName": "gelfriend_results_read",
+      "description": "Read paginated band values, validity and current experiment results. Pending values are not silently treated as final.",
+      "readOnly": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "profile.read",
+      "toolName": "gelfriend_profile_read",
+      "description": "Read the exact original/background/net integration curve for one lane; coordinates are in its analysis frame.",
+      "readOnly": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "laneId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "channelId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "laneId"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "history.undo",
+      "toolName": "gelfriend_history_undo",
+      "description": "Undo the last project data edit; does not restore raw pixels or discard a document. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "history.redo",
+      "toolName": "gelfriend_history_redo",
+      "description": "Redo the last undone project edit. Read workspace.state first; pass its documentId and revision as expectedDocumentId and expectedRevision.",
+      "readOnly": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "expectedDocumentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "expectedDocumentId",
+          "expectedRevision"
+        ],
+        "additionalProperties": false
+      }
+    }
+  ]
+}

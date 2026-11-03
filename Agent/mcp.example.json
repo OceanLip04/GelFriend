@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "gelfriend": {
+      "command": "/absolute/path/GelFriend-v2.4.0.app/Contents/MacOS/gelfriend-agent",
+      "args": ["--stdio"]
+    }
+  }
+}
